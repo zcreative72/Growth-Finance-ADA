@@ -9,80 +9,247 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
-        :root { --primary: #2d5a5a; --secondary: #f0f7ff; --accent: #d1e8e2; --text: #333; --focus: #005a9c; }
-        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; color: var(--text); max-width: 850px; margin: 20px auto; padding: 20px; background: #f9f9f9; }
-        .container { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e0e0e0; }
-        h1 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; font-size: 1.8em; }
-        .scenario-card { background: #fff; border: 2px solid var(--primary); border-radius: 10px; padding: 20px; margin-bottom: 25px; }
-        
-        /* Custom Dropdown Styling */
-        .custom-select-wrapper { position: relative; width: 100%; margin: 15px 0; }
-        .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #fff; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .select-trigger:focus { outline: 3px solid var(--focus); }
-        .select-trigger:after { content: '▼'; font-size: 0.7em; margin-left: 10px; color: var(--primary); }
-        .custom-options { position: absolute; display: none; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-top: none; z-index: 100; max-height: 450px; overflow-y: auto; }
+        :root {
+            --primary: #2d5a5a;
+            --secondary: #f0f7ff;
+            --accent: #d1e8e2;
+            --text: #333;
+            --focus: #005a9c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            max-width: 850px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 1.8em; }
+
+        .scenario-card {
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* --- Accessible Custom Dropdown --- */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 50px;
+        }
+
+        .select-trigger:focus {
+            outline: 3px solid var(--focus);
+        }
+
+        .select-trigger:after {
+            content: '▼';
+            font-size: 0.7em;
+            margin-left: 10px;
+            color: var(--primary);
+        }
+
+        .custom-options {
+            position: absolute;
+            display: none;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 100;
+            max-height: 450px;
+            overflow-y: auto;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
         .custom-options.open { display: block; }
-        .custom-option { padding: 20px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .custom-option:hover, .custom-option:focus { background: var(--secondary); outline: none; }
-        .model-name { font-weight: bold; color: var(--primary); display: block; margin-bottom: 10px; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; font-weight: bold; }
+
+        .custom-option {
+            padding: 20px 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #eee;
+        }
+
+        .custom-option:hover, .custom-option:focus {
+            background: var(--secondary);
+            outline: none;
+        }
+
+        .custom-option .model-name {
+            font-weight: bold;
+            font-size: 1.05em;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .controls { margin-top: 25px; }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        button:focus { outline: 3px solid var(--focus); }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: bold;
+        }
+
         .feedback.correct { background: #d4edda; color: #155724; display: block; }
         .feedback.wrong { background: #f8d7da; color: #721c24; display: block; }
-        button { background: var(--primary); color: white; border: none; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
-        button:focus { outline: 3px solid var(--focus); }
+        
+        math { font-size: 1.3em; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Financial Models: Accessible Edition</h1>
+    
     <main id="game-area">
         <section class="scenario-card" aria-labelledby="scenario-label">
             <h2 id="scenario-label" style="font-size: 1.1em; margin-bottom: 10px;">Goal: Identify the Model</h2>
             <p><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
             
             <div class="custom-select-wrapper" id="customSelect">
-                <div class="select-trigger" id="triggerText" role="combobox" aria-expanded="false" aria-haspopup="listbox" tabindex="0">
+                <div class="select-trigger" 
+                     id="triggerText" 
+                     role="combobox" 
+                     aria-expanded="false" 
+                     aria-haspopup="listbox" 
+                     tabindex="0">
                      -- Choose the Correct Model --
                 </div>
                 
                 <div class="custom-options" id="optionsContainer" role="listbox">
-                    <div class="custom-option" role="option" data-value="linear" tabindex="-1" aria-label="Linear Growth: P sub n equals P zero plus d times n">
+                    
+                    <div class="custom-option" role="option" data-value="linear" tabindex="-1"
+                         aria-label="Linear Growth: P sub n equals P zero plus d times n">
                         <span class="model-name">Linear Growth</span>
                         <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi></math>
                     </div>
 
-                    <div class="custom-option" role="option" data-value="exponential" tabindex="-1" aria-label="Exponential Growth: P sub n equals P zero times the quantity one plus r, to the power of n">
+                    <div class="custom-option" role="option" data-value="exponential" tabindex="-1"
+                         aria-label="Exponential Growth: P sub n equals P zero times the quantity one plus r, to the power of n">
                         <span class="model-name">Exponential Growth</span>
                         <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mi>r</mi></mrow></mfenced><mi>n</mi></msup></math>
                     </div>
 
-                    <div class="custom-option" role="option" data-value="logistic" tabindex="-1" aria-label="Logistic Growth: P sub n equals P sub n minus one, plus r times the quantity one minus P sub n minus one divided by K, times P sub n minus one">
+                    <div class="custom-option" role="option" data-value="logistic" tabindex="-1"
+                         aria-label="Logistic Growth: P sub n equals P sub n minus one, plus r times the quantity one minus P sub n minus one divided by K, times P sub n minus one">
                         <span class="model-name">Logistic Growth</span>
-                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi><mfenced><mrow><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac></mrow></mfenced><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub></math>
+                        <math display="block" aria-hidden="true">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi>
+                            <mfenced><mrow><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac></mrow></mfenced>
+                            <msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub>
+                        </math>
                     </div>
 
-                    <div class="custom-option" role="option" data-value="savings" tabindex="-1" aria-label="Savings Annuity: P sub n equals the fraction d times the quantity one plus r over k, to the power of n k, minus one. All over r divided by k.">
+                    <div class="custom-option" role="option" data-value="compound" tabindex="-1"
+                         aria-label="Compound Interest: A equals P times the quantity one plus r over k, to the power of n times k">
+                        <span class="model-name">Compound Interest</span>
+                        <math display="block" aria-hidden="true"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup></math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="savings" tabindex="-1"
+                         aria-label="Savings Annuity: P sub n equals the fraction d times the quantity one plus r over k, to the power of n k, minus one. All over r divided by k in parentheses.">
                         <span class="model-name">Savings Annuity</span>
-                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><mfrac><mrow><mi>d</mi><mfenced><mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow></mfenced></mrow><mfenced><mfrac><mi>r</mi><mi>k</mi></mfrac></mfenced></mfrac></math>
+                        <math display="block" aria-hidden="true">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo>
+                            <mfrac>
+                                <mrow> <mi>d</mi> <mfenced><mrow> <msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn> </mrow></mfenced> </mrow>
+                                <mrow> <mfenced><mrow><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced> </mrow>
+                            </mfrac>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="payout" tabindex="-1"
+                         aria-label="Payout Annuity: P zero equals the fraction d times the quantity one minus one plus r over k, to the power of negative n k. All over r divided by k in parentheses.">
+                        <span class="model-name">Payout/Loan Annuity</span>
+                        <math display="block" aria-hidden="true">
+                            <msub><mi>P</mi><mn>0</mn></msub><mo>=</mo>
+                            <mfrac>
+                                <mrow> <mi>d</mi> <mfenced><mrow> <mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup> </mrow></mfenced> </mrow>
+                                <mrow> <mfenced><mrow><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced> </mrow>
+                            </mfrac>
+                        </math>
                     </div>
                 </div>
             </div>
 
-            <button type="button" id="checkButton">Check Answer</button>
-            <div id="feedback" class="feedback" role="alert"></div>
+            <div class="controls">
+                <button type="button" id="checkButton">Check Answer</button>
+                <div id="feedback" class="feedback" role="alert"></div>
+            </div>
         </section>
     </main>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // SCENARIOS LIST (Add all 16 here)
         const scenarios = [
             { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
             { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
-            { text: "Monthly deposits of $200 into an account earning 5% interest for 20 years.", answer: "savings" }
+            { text: "Monthly deposits of $200 into an account earning 5% interest for 20 years.", answer: "savings" },
+            { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
+            { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
+            { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" },
+            // Add your additional 10 scenarios here...
         ];
 
+        // FISHER-YATES SHUFFLE
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        shuffle(scenarios);
         let currentIndex = 0;
         let selectedValue = "";
 
@@ -93,6 +260,12 @@
         const scenarioSpan = document.getElementById('current-scenario');
 
         function loadScenario() {
+            if (currentIndex >= scenarios.length) {
+                scenarioSpan.innerText = "Challenge Complete! You have identified all scenarios correctly. Refresh to play again.";
+                trigger.parentElement.style.display = 'none';
+                checkBtn.style.display = 'none';
+                return;
+            }
             scenarioSpan.innerText = scenarios[currentIndex].text;
             trigger.innerText = "-- Choose the Correct Model --";
             selectedValue = "";
@@ -101,19 +274,10 @@
             optionsCont.classList.remove('open');
         }
 
-        // Dropdown Logic
-        trigger.addEventListener('click', (e) => {
+        trigger.addEventListener('click', function(e) {
             e.stopPropagation();
             const isOpen = optionsCont.classList.toggle('open');
             trigger.setAttribute('aria-expanded', isOpen);
-        });
-
-        // Keyboard navigation (Enter/Space to open)
-        trigger.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                trigger.click();
-            }
         });
 
         document.querySelectorAll('.custom-option').forEach(opt => {
@@ -122,19 +286,31 @@
                 trigger.innerText = this.querySelector('.model-name').innerText;
                 optionsCont.classList.remove('open');
                 trigger.setAttribute('aria-expanded', 'false');
-                trigger.focus();
+                feedbackDiv.style.display = 'none';
             });
         });
 
+        window.addEventListener('click', function() {
+            optionsCont.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        });
+
         checkBtn.addEventListener('click', function() {
-            if (!selectedValue) return alert("Please select a model!");
+            if (!selectedValue) {
+                alert("Please select a model first!");
+                return;
+            }
+
             feedbackDiv.style.display = 'block';
             if (selectedValue === scenarios[currentIndex].answer) {
-                feedbackDiv.innerText = "✓ Correct!";
+                feedbackDiv.innerText = "✓ Correct! Well done.";
                 feedbackDiv.className = "feedback correct";
-                setTimeout(() => { currentIndex = (currentIndex + 1) % scenarios.length; loadScenario(); }, 2000);
+                setTimeout(() => {
+                    currentIndex++;
+                    loadScenario();
+                }, 2000);
             } else {
-                feedbackDiv.innerText = "✗ Not quite. Try again!";
+                feedbackDiv.innerText = "✗ Not quite. Look at the variables again.";
                 feedbackDiv.className = "feedback wrong";
             }
         });
@@ -142,5 +318,6 @@
         loadScenario();
     });
 </script>
+
 </body>
 </html>
