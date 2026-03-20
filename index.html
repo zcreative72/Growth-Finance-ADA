@@ -18,7 +18,7 @@
         .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #fff; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .select-trigger:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
         .select-trigger:after { content: '▼'; font-size: 0.7em; margin-left: 10px; color: var(--primary); }
-        .custom-options { position: absolute; display: none; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-top: none; z-index: 100; max-height: 450px; overflow-y: auto; }
+        .custom-options { position: absolute; display: none; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-top: none; z-index: 100; max-height: 450px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .custom-options.open { display: block; }
         .custom-option { padding: 20px 15px; cursor: pointer; border-bottom: 1px solid #eee; transition: background 0.2s; }
         .custom-option:hover, .custom-option:focus { background: var(--secondary); outline: 2px inset var(--focus); }
@@ -34,14 +34,14 @@
 <body>
 
 <div class="container">
-    <h1>Financial Models: Accessible Edition</h1>
+    <header><h1>Financial Models: Accessible Edition</h1></header>
     <main id="game-area">
         <section class="scenario-card" aria-labelledby="scenario-label">
             <h2 id="scenario-label" style="font-size: 1.1em; margin-bottom: 10px;">Goal: Identify the Model</h2>
             <p><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
             
             <div class="custom-select-wrapper">
-                <div class="select-trigger" id="triggerText" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select mathematical model" tabindex="0">
+                <div class="select-trigger" id="triggerText" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select a mathematical model" tabindex="0">
                      -- Choose the Correct Model --
                 </div>
                 
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
         { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
         { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" },
-        // Add more scenarios here
+        // Add remaining 10 scenarios here...
     ];
 
     function shuffle(array) {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
             trigger.focus();
         });
         opt.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === 'Enter') {
                 e.preventDefault();
                 this.click();
             }
@@ -161,11 +161,11 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!selectedValue) return;
         feedbackDiv.style.display = 'block';
         if (selectedValue === shuffled[currentIndex].answer) {
-            feedbackDiv.innerText = "Correct!";
+            feedbackDiv.innerText = "✓ Correct!";
             feedbackDiv.className = "feedback correct";
             setTimeout(() => { currentIndex++; loadScenario(); }, 1800);
         } else {
-            feedbackDiv.innerText = "Not quite. Try again!";
+            feedbackDiv.innerText = "✗ Not quite. Try again!";
             feedbackDiv.className = "feedback wrong";
         }
     });
