@@ -86,6 +86,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // 1. DATA (All 16 slots)
     const allScenarios = [
         { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
         { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
@@ -93,9 +94,10 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
         { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
         { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" },
-        // Add remaining 10 scenarios here...
+        // ... fill in the rest of your 16 scenarios here
     ];
 
+    // 2. SHUFFLE
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -116,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function loadScenario() {
         if (currentIndex >= shuffled.length) {
-            scenarioSpan.innerText = "Review Complete! Refresh to play again.";
+            scenarioSpan.innerText = "Challenge Complete! Refresh to play again.";
             trigger.parentElement.style.display = 'none';
             checkBtn.style.display = 'none';
             return;
