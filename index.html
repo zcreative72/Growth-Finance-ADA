@@ -35,7 +35,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
+        h1 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 1.8em; }
 
         .scenario-card {
             background: #fff;
@@ -66,10 +66,8 @@
             min-height: 50px;
         }
 
-        /* ADA Focus Indicator */
         .select-trigger:focus {
             outline: 3px solid var(--focus);
-            border-color: transparent;
         }
 
         .select-trigger:after {
@@ -149,12 +147,12 @@
 <body>
 
 <div class="container">
-    <h1 style="font-size: 1.8em; color: var(--primary);">Financial Models: Accessible Edition</h1>
+    <h1>Financial Models: Accessible Edition</h1>
     
     <main id="game-area">
         <section class="scenario-card" aria-labelledby="scenario-label">
-            <h2 id="scenario-label" style="font-size: 1.1em; border: none;">Current Scenario</h2>
-            <p id="scenario-text" style="font-size: 1.2em;">Loading scenario...</p>
+            <h2 id="scenario-label" style="font-size: 1.1em; margin-bottom: 10px;">Goal: Identify the Model</h2>
+            <p><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
             
             <div class="custom-select-wrapper" id="customSelect">
                 <div class="select-trigger" 
@@ -162,7 +160,6 @@
                      role="combobox" 
                      aria-expanded="false" 
                      aria-haspopup="listbox" 
-                     aria-controls="optionsContainer"
                      tabindex="0">
                      -- Choose the Correct Model --
                 </div>
@@ -224,7 +221,7 @@
             </div>
 
             <div class="controls">
-                <button id="checkButton" aria-live="polite">Check Answer</button>
+                <button type="button" id="checkButton">Check Answer</button>
                 <div id="feedback" class="feedback" role="alert"></div>
             </div>
         </section>
@@ -232,98 +229,88 @@
 </div>
 
 <script>
-    const scenarios = [
-        { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
-        { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
-        { text: "Monthly deposits of $200 into an account earning 5% interest for 20 years.", answer: "savings" },
-        { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
-        { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
-        { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" }
-    ];
+    // Ensure the script runs after the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", function() {
+        const scenarios = [
+            { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
+            { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
+            { text: "Monthly deposits of $200 into an account earning 5% interest for 20 years.", answer: "savings" },
+            { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
+            { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
+            { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" }
+        ];
 
-    let currentIndex = 0;
-    let selectedValue = "";
+        let currentIndex = 0;
+        let selectedValue = "";
 
-    const trigger = document.getElementById('triggerText');
-    const optionsCont = document.getElementById('optionsContainer');
-    const checkBtn = document.getElementById('checkButton');
-    const feedbackDiv = document.getElementById('feedback');
-    const scenarioP = document.getElementById('scenario-text');
+        const trigger = document.getElementById('triggerText');
+        const optionsCont = document.getElementById('optionsContainer');
+        const checkBtn = document.getElementById('checkButton');
+        const feedbackDiv = document.getElementById('feedback');
+        const scenarioSpan = document.getElementById('current-scenario');
 
-    function loadScenario() {
-        scenarioP.innerText = scenarios[currentIndex].text;
-        trigger.innerText = "-- Choose the Correct Model --";
-        selectedValue = "";
-        feedbackDiv.style.display = 'none';
-        trigger.setAttribute('aria-expanded', 'false');
-    }
-
-    // Toggle Menu
-    function toggleMenu() {
-        const isOpen = optionsCont.classList.toggle('open');
-        trigger.setAttribute('aria-expanded', isOpen);
-    }
-
-    trigger.addEventListener('click', toggleMenu);
-    
-    // Accessibility: Keyboard Support for Trigger
-    trigger.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleMenu();
+        function loadScenario() {
+            scenarioSpan.innerText = scenarios[currentIndex].text;
+            trigger.innerText = "-- Choose the Correct Model --";
+            selectedValue = "";
+            feedbackDiv.style.display = 'none';
+            trigger.setAttribute('aria-expanded', 'false');
+            optionsCont.classList.remove('open');
         }
-    });
 
-    // Option Selection
-    document.querySelectorAll('.custom-option').forEach(opt => {
-        opt.addEventListener('click', function() {
-            selectThis(this);
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = optionsCont.classList.toggle('open');
+            trigger.setAttribute('aria-expanded', isOpen);
         });
-        // Key support for options
-        opt.addEventListener('keydown', function(e) {
+
+        trigger.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                selectThis(this);
+                const isOpen = optionsCont.classList.toggle('open');
+                trigger.setAttribute('aria-expanded', isOpen);
             }
         });
-    });
 
-    function selectThis(element) {
-        selectedValue = element.getAttribute('data-value');
-        trigger.innerText = element.querySelector('.model-name').innerText;
-        optionsCont.classList.remove('open');
-        trigger.setAttribute('aria-expanded', 'false');
-        trigger.focus();
-    }
+        document.querySelectorAll('.custom-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                selectedValue = this.getAttribute('data-value');
+                trigger.innerText = this.querySelector('.model-name').innerText;
+                optionsCont.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+                feedbackDiv.style.display = 'none';
+                trigger.focus();
+            });
+        });
 
-    window.addEventListener('click', (e) => {
-        if (!document.getElementById('customSelect').contains(e.target)) {
+        window.addEventListener('click', function() {
             optionsCont.classList.remove('open');
             trigger.setAttribute('aria-expanded', 'false');
-        }
+        });
+
+        checkBtn.addEventListener('click', function() {
+            if (!selectedValue) {
+                alert("Please select a model first!");
+                return;
+            }
+
+            feedbackDiv.style.display = 'block';
+            if (selectedValue === scenarios[currentIndex].answer) {
+                feedbackDiv.innerText = "✓ Correct! Well done.";
+                feedbackDiv.className = "feedback correct";
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % scenarios.length;
+                    loadScenario();
+                }, 2000);
+            } else {
+                feedbackDiv.innerText = "✗ Not quite. Look at the variables again.";
+                feedbackDiv.className = "feedback wrong";
+            }
+        });
+
+        // Initialize the first scenario
+        loadScenario();
     });
-
-    checkBtn.addEventListener('click', () => {
-        if (!selectedValue) {
-            alert("Please select a model first!");
-            return;
-        }
-
-        feedbackDiv.style.display = 'block';
-        if (selectedValue === scenarios[currentIndex].answer) {
-            feedbackDiv.innerText = "✓ Correct! Moving to the next scenario.";
-            feedbackDiv.className = "feedback correct";
-            setTimeout(() => {
-                currentIndex = (currentIndex + 1) % scenarios.length;
-                loadScenario();
-            }, 2500);
-        } else {
-            feedbackDiv.innerText = "✗ Not quite. Look at the variables in the scenario again.";
-            feedbackDiv.className = "feedback wrong";
-        }
-    });
-
-    loadScenario();
 </script>
 
 </body>
