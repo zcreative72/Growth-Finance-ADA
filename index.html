@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function loadScenario() {
         if (currentIndex >= shuffled.length) {
-            scenarioSpan.innerText = "Review Complete! Refresh to restart.";
+            scenarioSpan.innerText = "Review Complete! Refresh to play again.";
             trigger.parentElement.style.display = 'none';
             checkBtn.style.display = 'none';
             return;
@@ -139,12 +139,14 @@ document.addEventListener("DOMContentLoaded", function() {
         trigger.setAttribute('aria-expanded', 'false');
     }
 
+    // Toggle menu
     trigger.addEventListener('click', (e) => {
         e.stopPropagation();
         const isOpen = optionsCont.classList.toggle('open');
         trigger.setAttribute('aria-expanded', isOpen);
     });
 
+    // Keyboard support for trigger
     trigger.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -152,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // Selection logic
     document.querySelectorAll('.custom-option').forEach(opt => {
         opt.addEventListener('click', function() {
             selectedValue = this.getAttribute('data-value');
@@ -168,6 +171,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    // Close on click outside
+    window.addEventListener('click', () => {
+        optionsCont.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+    });
+
+    // Check Answer logic
     checkBtn.addEventListener('click', function() {
         if (!selectedValue) return;
         feedbackDiv.style.display = 'block';
