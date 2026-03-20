@@ -4,184 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessible Financial Models Challenge</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #0f172a; }
-        .focus-ring:focus { outline: 3px solid #4338ca; outline-offset: 2px; }
-        math { font-size: 1.35rem; color: #1e1b4b; }
-        .btn-primary { background-color: #1e1b4b; color: #ffffff; border: 2px solid #1e1b4b; transition: all 0.2s; }
-        .btn-primary:hover:not(:disabled) { background-color: #312e81; transform: translateY(-1px); }
-        .btn-primary:disabled { background-color: #94a3b8; border-color: #94a3b8; cursor: not-allowed; }
-        .card { border: 1px solid #e2e8f0; transition: border-color 0.3s; }
-        .card-correct { border: 2px solid #059669; background-color: #f0fdf4; }
+        :root {
+            --primary: #2d5a5a;
+            --secondary: #f0f7ff;
+            --accent: #d1e8e2;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+
+        .scenario-card {
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* --- Custom Dropdown Styling --- */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .select-trigger:after {
+            content: '▼';
+            font-size: 0.8em;
+            margin-left: 10px;
+            color: var(--primary);
+        }
+
+        .custom-options {
+            position: absolute;
+            display: none;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 100;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .custom-options.open { display: block; }
+
+        .custom-option {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #eee;
+        }
+
+        .custom-option:hover { background: var(--secondary); }
+
+        .custom-option .model-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 4px;
+        }
+
+        /* MathML Styling inside dropdown */
+        .custom-option math {
+            font-size: 1em;
+            color: #444;
+        }
+
+        /* Controls */
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .feedback.correct { background: #d4edda; color: #155724; display: block; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; display: block; }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
-        <header class="mb-8 border-b border-slate-200 pb-6">
-            <h1 class="text-3xl font-extrabold text-indigo-950 mb-2">Financial Models: Accessible Edition</h1>
-            <p class="text-slate-600 text-lg mb-4">Identify the correct mathematical model for each financial scenario.</p>
+<body>
+
+<div class="container">
+    <h2>Financial Models: Accessible Edition</h2>
+    <p>Identify the correct mathematical model for each financial scenario.</p>
+
+    <div id="game-area">
+        <div class="scenario-card">
+            <p id="scenario-text"><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
             
-            <div class="flex flex-wrap gap-8 py-4 bg-white px-6 rounded-xl shadow-sm border border-slate-100" aria-live="polite">
-                <div><span class="text-slate-500 uppercase text-xs font-bold tracking-wider block">Progress</span> Round <span id="round-val" class="text-xl font-bold">1</span> of 4</div>
-                <div><span class="text-slate-500 uppercase text-xs font-bold tracking-wider block">Accuracy</span> <span id="acc-val" class="text-xl font-bold text-indigo-700">100%</span></div>
-                <div><span class="text-slate-500 uppercase text-xs font-bold tracking-wider block">Attempts</span> <span id="att-val" class="text-xl font-bold text-slate-700">0</span></div>
-            </div>
-        </header>
-
-        <main id="game-container" class="space-y-6">
-            </main>
-
-        <div id="announcer" class="sr-only" aria-live="assertive"></div>
-
-        <div id="modal" class="fixed inset-0 bg-slate-900/90 flex items-center justify-center hidden px-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-            <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
-                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+            <div class="custom-select-wrapper" id="customSelect">
+                <div class="select-trigger" id="triggerText">-- Choose the Correct Model --</div>
+                <div class="custom-options" id="optionsContainer">
+                    <div class="custom-option" data-value="linear">
+                        <span class="model-name">Linear Growth</span>
+                        <math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi></math>
+                    </div>
+                    <div class="custom-option" data-value="exponential">
+                        <span class="model-name">Exponential Growth</span>
+                        <math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><msup><mo>)</mo><mi>n</mi></msup></math>
+                    </div>
+                    <div class="custom-option" data-value="logistic">
+                        <span class="model-name">Logistic Growth</span>
+                        <math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><mfrac><mi>L</mi><mrow><mn>1</mn><mo>+</mo><mi>C</mi><msup><mi>e</mi><mrow><mo>-</mo><mi>k</mi><mi>n</mi></mrow></msup></mrow></mfrac></math>
+                    </div>
+                    <div class="custom-option" data-value="compound">
+                        <span class="model-name">Compound Interest</span>
+                        <math display="block"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><mo>)</mo></mrow><mrow><mi>n</mi><mi>k</mi></mrow></msup></math>
+                    </div>
+                    <div class="custom-option" data-value="savings">
+                        <span class="model-name">Savings Annuity</span>
+                        <math display="block"><mi>F</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mo>[</mo><mfrac><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><msup><mo>)</mo><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac><mo>]</mo></math>
+                    </div>
+                    <div class="custom-option" data-value="payout">
+                        <span class="model-name">Payout/Loan Annuity</span>
+                        <math display="block"><mi>P</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mo>[</mo><mfrac><mrow><mn>1</mn><mo>-</mo><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><msup><mo>)</mo><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac><mo>]</mo></math>
+                    </div>
                 </div>
-                <h2 id="modal-title" class="text-2xl font-bold text-slate-900 mb-2">Round Complete!</h2>
-                <p id="modal-desc" class="text-slate-600 mb-6">Great job. Ready for the next set of challenges?</p>
-                <button id="next-btn" class="w-full py-4 btn-primary rounded-xl font-bold text-lg focus-ring shadow-lg">Continue to Round 2</button>
             </div>
+
+            <button onclick="checkAnswer()">Check Answer</button>
+            <div id="feedback" class="feedback"></div>
         </div>
     </div>
+</div>
 
 <script>
-const categories = [
-    { id: 'linear', name: 'Linear Growth', math: `<math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi></math>` },
-    { id: 'exponential', name: 'Exponential Growth', math: `<math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>)</mo></mrow><mi>n</mi></msup></math>` },
-    { id: 'logistic', name: 'Logistic Growth', math: `<math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi><mo>(</mo><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac><mo>)</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub></math>` },
-    { id: 'compound', name: 'Compound Interest', math: `<math display="block"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><mo>)</mo></mrow><mrow><mi>n</mi><mi>k</mi></mrow></msup></math>` },
-    { id: 'savings', name: 'Savings Annuity', math: `<math display="block"><mi>A</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mo>[</mo><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>/</mo><mi>k</mi><mo>)</mo></mrow><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn><mo>]</mo></mrow><mrow><mo>(</mo><mi>r</mi><mo>/</mo><mi>k</mi><mo>)</mo></mrow></mfrac></math>` },
-    { id: 'payout', name: 'Payout/Loan Annuity', math: `<math display="block"><msub><mi>P</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mi>d</mi><mo>[</mo><mn>1</mn><mo>-</mo><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>/</mo><mi>k</mi><mo>)</mo></mrow><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup><mo>]</mo></mrow><mrow><mo>(</mo><mi>r</mi><mo>/</mo><mi>k</mi><mo>)</mo></mrow></mfrac></math>` }
-];
+    // Game Data
+    const scenarios = [
+        { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
+        { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
+        { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
+        { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" }
+    ];
 
-const allItems = [
-    // Round 1
-    { text: "A rental car company charges $45 plus 25 cents per each mile driven.", cat: 'linear' },
-    { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly. About how long will it take to reach $9300?", cat: 'compound' },
-    { text: "Suppose inflation decreases the value of money by 4% each year. How much will $100 buy in 25 years?", cat: 'exponential' },
-    { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", cat: 'logistic' },
-    // Round 2
-    { text: "You deposit $2000 each year into an account earning 6% interest. How much will you have in 15 years?", cat: 'savings' },
-    { text: "You want to take out a $250,000 mortgage at 4.5% interest for 30 years. What are your monthly payments?", cat: 'payout' },
-    { text: "A gym membership costs $20 to join and $15 per month.", cat: 'linear' },
-    { text: "The number of bacteria in a petri dish doubles every 3 hours.", cat: 'exponential' },
-    // Round 3
-    { text: "You win the lottery and want to receive $50,000 a year for the next 20 years from an account earning 5%.", cat: 'payout' },
-    { text: "A tree grows 1.5 feet every year.", cat: 'linear' },
-    { text: "An investment of $10,000 earns 8% interest compounded monthly.", cat: 'compound' },
-    { text: "You put $100 monthly into an IRA for 40 years.", cat: 'savings' },
-    // Round 4
-    { text: "A virus is spreading in a small town. The infection rate slows as more people become immune.", cat: 'logistic' },
-    { text: "The value of a car depreciates by 15% each year.", cat: 'exponential' },
-    { text: "A student loan of $30,000 is being paid back over 10 years at 6% interest.", cat: 'payout' },
-    { text: "A savings account earns 0.5% interest compounded annually.", cat: 'compound' }
-];
+    let currentIndex = 0;
+    let selectedValue = "";
 
-let round = 1, att = 0, corr = 0;
+    // --- Custom Dropdown Logic ---
+    const wrapper = document.getElementById('customSelect');
+    const trigger = document.getElementById('triggerText');
+    const optionsCont = document.getElementById('optionsContainer');
 
-function renderRound() {
-    const container = document.getElementById('game-container');
-    container.innerHTML = '';
-    const roundItems = allItems.slice((round-1)*4, round*4);
+    trigger.addEventListener('click', () => optionsCont.classList.toggle('open'));
 
-    roundItems.forEach((item, index) => {
-        const section = document.createElement('div');
-        section.className = "card bg-white p-6 rounded-2xl shadow-sm space-y-4";
-        section.id = `card-${index}`;
-        section.innerHTML = `
-            <p class="text-xl font-semibold text-slate-800" id="q-${index}">${item.text}</p>
-            <div class="flex flex-col md:flex-row gap-4 items-center">
-                <div class="w-full md:w-auto flex-grow">
-                    <label for="select-${index}" class="sr-only">Select financial model</label>
-                    <select id="select-${index}" class="focus-ring border-2 border-slate-200 p-3 rounded-xl bg-slate-50 w-full text-slate-900 font-medium">
-                        <option value="">-- Choose the Correct Model --</option>
-                        ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-                    </select>
-                </div>
-                <button onclick="check(${index}, '${item.cat}')" id="btn-${index}" class="btn-primary px-8 py-3 rounded-xl font-bold focus-ring whitespace-nowrap w-full md:w-auto">Check Answer</button>
-            </div>
-            <div id="feedback-${index}" class="font-bold flex items-center gap-2" aria-live="polite"></div>
-            <div id="formula-${index}" class="mt-4 p-5 bg-indigo-50 rounded-xl hidden border border-indigo-100 shadow-inner">
-                <span class="text-xs uppercase font-black text-indigo-400 tracking-widest block mb-3">Mathematical Model</span>
-                <div class="flex justify-center items-center py-2"></div>
-            </div>
-        `;
-        container.appendChild(section);
+    document.querySelectorAll('.custom-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            selectedValue = this.getAttribute('data-value');
+            trigger.innerHTML = this.querySelector('.model-name').innerText; // Update display
+            optionsCont.classList.remove('open');
+            document.getElementById('feedback').className = 'feedback'; // Reset feedback on change
+        });
     });
-    window.scrollTo(0,0);
-}
 
-window.check = (idx, correctCat) => {
-    const sel = document.getElementById(`select-${idx}`);
-    const feed = document.getElementById(`feedback-${idx}`);
-    const form = document.getElementById(`formula-${idx}`);
-    const btn = document.getElementById(`btn-${idx}`);
-    const card = document.getElementById(`card-${idx}`);
-    const announcer = document.getElementById('announcer');
-    
-    if(!sel.value) return;
+    // Close dropdown if clicking outside
+    window.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) optionsCont.classList.remove('open');
+    });
 
-    att++;
-    if(sel.value === correctCat) {
-        corr++;
-        card.classList.add('card-correct');
-        feed.innerHTML = `<span class="text-emerald-700 text-lg">✓ Correct: ${categories.find(c => c.id === correctCat).name}</span>`;
-        announcer.textContent = "Correct! The mathematical model has been revealed.";
-        
-        // Render MathML
-        const catObj = categories.find(c => c.id === correctCat);
-        form.querySelector('div').innerHTML = catObj.math;
-        form.classList.remove('hidden');
-        
-        sel.disabled = true;
-        btn.disabled = true;
-        checkRoundEnd();
-    } else {
-        feed.innerHTML = `<span class="text-rose-700">✕ Incorrect. Try a different model.</span>`;
-        announcer.textContent = "Incorrect answer. Please try again.";
+    // Game Functions
+    function loadScenario() {
+        document.getElementById('current-scenario').innerText = scenarios[currentIndex].text;
+        trigger.innerText = "-- Choose the Correct Model --";
+        selectedValue = "";
+        document.getElementById('feedback').className = 'feedback';
     }
-    updateStats();
-};
 
-function updateStats() {
-    document.getElementById('att-val').innerText = att;
-    document.getElementById('acc-val').innerText = Math.round((corr/att)*100) + '%';
-}
+    function checkAnswer() {
+        const feedback = document.getElementById('feedback');
+        if (!selectedValue) {
+            alert("Please select a model first!");
+            return;
+        }
 
-function checkRoundEnd() {
-    const totalCorrectInRound = document.querySelectorAll('select:disabled').length;
-    if(totalCorrectInRound === 4) {
-        setTimeout(() => {
-            const modal = document.getElementById('modal');
-            const nextBtn = document.getElementById('next-btn');
-            if(round === 4) {
-                document.getElementById('modal-title').innerText = "Course Mastered!";
-                document.getElementById('modal-desc').innerText = `Final Accuracy: ${document.getElementById('acc-val').innerText}`;
-                nextBtn.innerText = "Restart Challenge";
-            } else {
-                nextBtn.innerText = `Start Round ${round + 1}`;
-            }
-            modal.classList.remove('hidden');
-            nextBtn.focus();
-        }, 800);
+        if (selectedValue === scenarios[currentIndex].answer) {
+            feedback.innerText = "✓ Correct!";
+            feedback.className = "feedback correct";
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % scenarios.length;
+                loadScenario();
+            }, 2000);
+        } else {
+            feedback.innerText = "✗ Not quite. Try again!";
+            feedback.className = "feedback wrong";
+        }
     }
-}
 
-document.getElementById('next-btn').onclick = () => {
-    if(round < 4) {
-        round++;
-        document.getElementById('round-val').innerText = round;
-        document.getElementById('modal').classList.add('hidden');
-        renderRound();
-    } else {
-        location.reload();
-    }
-};
-
-// Initial Render
-renderRound();
+    // Initialize
+    loadScenario();
 </script>
+
 </body>
 </html>
