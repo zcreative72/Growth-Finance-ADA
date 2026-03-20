@@ -16,7 +16,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: var(--text);
-            max-width: 800px;
+            max-width: 850px;
             margin: 20px auto;
             padding: 20px;
             background-color: #f9f9f9;
@@ -78,7 +78,7 @@
             border-top: none;
             border-radius: 0 0 8px 8px;
             z-index: 100;
-            max-height: 400px;
+            max-height: 450px;
             overflow-y: auto;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
@@ -86,7 +86,7 @@
         .custom-options.open { display: block; }
 
         .custom-option {
-            padding: 12px 15px;
+            padding: 15px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -98,16 +98,15 @@
         .custom-option .model-name {
             font-weight: bold;
             font-size: 1.1em;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            color: var(--primary);
         }
 
-        /* MathML Styling inside dropdown */
+        /* MathML Scaling */
         .custom-option math {
-            font-size: 1em;
-            color: #444;
+            font-size: 1.2em;
         }
 
-        /* Controls */
         button {
             background-color: var(--primary);
             color: white;
@@ -116,10 +115,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: opacity 0.2s;
         }
-
-        button:hover { opacity: 0.9; }
 
         .feedback {
             margin-top: 15px;
@@ -137,8 +133,7 @@
 
 <div class="container">
     <h2>Financial Models: Accessible Edition</h2>
-    <p>Identify the correct mathematical model for each financial scenario.</p>
-
+    
     <div id="game-area">
         <div class="scenario-card">
             <p id="scenario-text"><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
@@ -146,29 +141,47 @@
             <div class="custom-select-wrapper" id="customSelect">
                 <div class="select-trigger" id="triggerText">-- Choose the Correct Model --</div>
                 <div class="custom-options" id="optionsContainer">
+                    
                     <div class="custom-option" data-value="linear">
                         <span class="model-name">Linear Growth</span>
-                        <math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi></math>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi>
+                        </math>
                     </div>
+
                     <div class="custom-option" data-value="exponential">
                         <span class="model-name">Exponential Growth</span>
-                        <math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><msup><mo>)</mo><mi>n</mi></msup></math>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>)</mo></mrow><mi>n</mi></msup>
+                        </math>
                     </div>
+
                     <div class="custom-option" data-value="logistic">
                         <span class="model-name">Logistic Growth</span>
-                        <math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><mfrac><mi>L</mi><mrow><mn>1</mn><mo>+</mo><mi>C</mi><msup><mi>e</mi><mrow><mo>-</mo><mi>k</mi><mi>n</mi></mrow></msup></mrow></mfrac></math>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi><mfenced><mrow><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac></mrow></mfenced><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub>
+                        </math>
                     </div>
+
                     <div class="custom-option" data-value="compound">
                         <span class="model-name">Compound Interest</span>
-                        <math display="block"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><mo>)</mo></mrow><mrow><mi>n</mi><mi>k</mi></mrow></msup></math>
+                        <math display="block">
+                            <mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup>
+                        </math>
                     </div>
+
                     <div class="custom-option" data-value="savings">
                         <span class="model-name">Savings Annuity</span>
-                        <math display="block"><mi>F</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mo>[</mo><mfrac><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><msup><mo>)</mo><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac><mo>]</mo></math>
+                        <math display="block">
+                            <mi>F</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mfenced open="[" close="]"><mfrac><mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac></mfenced>
+                        </math>
                     </div>
+
                     <div class="custom-option" data-value="payout">
                         <span class="model-name">Payout/Loan Annuity</span>
-                        <math display="block"><mi>P</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mo>[</mo><mfrac><mrow><mn>1</mn><mo>-</mo><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac><msup><mo>)</mo><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac><mo>]</mo></math>
+                        <math display="block">
+                            <mi>P</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mfenced open="[" close="]"><mfrac><mrow><mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac></mfenced>
+                        </math>
                     </div>
                 </div>
             </div>
@@ -180,7 +193,6 @@
 </div>
 
 <script>
-    // Game Data
     const scenarios = [
         { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
         { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
@@ -191,7 +203,6 @@
     let currentIndex = 0;
     let selectedValue = "";
 
-    // --- Custom Dropdown Logic ---
     const wrapper = document.getElementById('customSelect');
     const trigger = document.getElementById('triggerText');
     const optionsCont = document.getElementById('optionsContainer');
@@ -201,18 +212,16 @@
     document.querySelectorAll('.custom-option').forEach(opt => {
         opt.addEventListener('click', function() {
             selectedValue = this.getAttribute('data-value');
-            trigger.innerHTML = this.querySelector('.model-name').innerText; // Update display
+            trigger.innerHTML = this.querySelector('.model-name').innerText;
             optionsCont.classList.remove('open');
-            document.getElementById('feedback').className = 'feedback'; // Reset feedback on change
+            document.getElementById('feedback').className = 'feedback';
         });
     });
 
-    // Close dropdown if clicking outside
     window.addEventListener('click', (e) => {
         if (!wrapper.contains(e.target)) optionsCont.classList.remove('open');
     });
 
-    // Game Functions
     function loadScenario() {
         document.getElementById('current-scenario').innerText = scenarios[currentIndex].text;
         trigger.innerText = "-- Choose the Correct Model --";
@@ -240,7 +249,6 @@
         }
     }
 
-    // Initialize
     loadScenario();
 </script>
 
