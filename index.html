@@ -129,4 +129,148 @@
         .feedback.correct { background: #d4edda; color: #155724; display: block; }
         .feedback.wrong { background: #f8d7da; color: #721c24; display: block; }
         
-        /* Ensure MathML looks consistent
+        /* Ensure MathML looks consistent */
+        math { font-size: 1.25em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Financial Models: Accessible Edition</h2>
+    
+    <div id="game-area">
+        <div class="scenario-card">
+            <p id="scenario-text"><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
+            
+            <div class="custom-select-wrapper" id="customSelect">
+                <div class="select-trigger" id="triggerText">-- Choose the Correct Model --</div>
+                <div class="custom-options" id="optionsContainer">
+                    
+                    <div class="custom-option" data-value="linear">
+                        <span class="model-name">Linear Growth</span>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" data-value="exponential">
+                        <span class="model-name">Exponential Growth</span>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mi>r</mi></mrow></mfenced><mi>n</mi></msup>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" data-value="logistic">
+                        <span class="model-name">Logistic Growth</span>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi>
+                            <mfenced><mrow>
+                                <mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac>
+                            </mrow></mfenced>
+                            <msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" data-value="compound">
+                        <span class="model-name">Compound Interest</span>
+                        <math display="block">
+                            <mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" data-value="savings">
+                        <span class="model-name">Savings Annuity</span>
+                        <math display="block">
+                            <mi>F</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi>
+                            <mfenced><mrow>
+                                <mfrac>
+                                    <mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow>
+                                    <mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow>
+                                </mfrac>
+                            </mrow></mfenced>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" data-value="payout">
+                        <span class="model-name">Payout/Loan Annuity</span>
+                        <math display="block">
+                            <mi>P</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi>
+                            <mfenced><mrow>
+                                <mfrac>
+                                    <mrow><mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow>
+                                    <mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow>
+                                </mfrac>
+                            </mrow></mfenced>
+                        </math>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="checkAnswer()">Check Answer</button>
+            <div id="feedback" class="feedback"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scenarios = [
+        { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
+        { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
+        { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
+        { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" }
+    ];
+
+    let currentIndex = 0;
+    let selectedValue = "";
+
+    const wrapper = document.getElementById('customSelect');
+    const trigger = document.getElementById('triggerText');
+    const optionsCont = document.getElementById('optionsContainer');
+
+    trigger.addEventListener('click', () => optionsCont.classList.toggle('open'));
+
+    document.querySelectorAll('.custom-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            selectedValue = this.getAttribute('data-value');
+            trigger.innerHTML = this.querySelector('.model-name').innerText;
+            optionsCont.classList.remove('open');
+            document.getElementById('feedback').className = 'feedback';
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) optionsCont.classList.remove('open');
+    });
+
+    function loadScenario() {
+        document.getElementById('current-scenario').innerText = scenarios[currentIndex].text;
+        trigger.innerText = "-- Choose the Correct Model --";
+        selectedValue = "";
+        document.getElementById('feedback').className = 'feedback';
+    }
+
+    function checkAnswer() {
+        const feedback = document.getElementById('feedback');
+        if (!selectedValue) {
+            alert("Please select a model first!");
+            return;
+        }
+
+        if (selectedValue === scenarios[currentIndex].answer) {
+            feedback.innerText = "✓ Correct!";
+            feedback.className = "feedback correct";
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % scenarios.length;
+                loadScenario();
+            }, 2000);
+        } else {
+            feedback.innerText = "✗ Not quite. Try again!";
+            feedback.className = "feedback wrong";
+        }
+    }
+
+    loadScenario();
+</script>
+
+</body>
+</html>
