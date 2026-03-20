@@ -16,14 +16,15 @@
         .scenario-card { background: #fff; border: 2px solid var(--primary); border-radius: 10px; padding: 20px; margin-bottom: 25px; }
         .custom-select-wrapper { position: relative; width: 100%; margin: 15px 0; }
         .select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #fff; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .select-trigger:focus { outline: 3px solid var(--focus); }
+        .select-trigger:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
         .select-trigger:after { content: '▼'; font-size: 0.7em; margin-left: 10px; color: var(--primary); }
         .custom-options { position: absolute; display: none; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-top: none; z-index: 100; max-height: 450px; overflow-y: auto; }
         .custom-options.open { display: block; }
-        .custom-option { padding: 20px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .custom-option:hover { background: var(--secondary); }
+        .custom-option { padding: 20px 15px; cursor: pointer; border-bottom: 1px solid #eee; transition: background 0.2s; }
+        .custom-option:hover, .custom-option:focus { background: var(--secondary); outline: 2px inset var(--focus); }
         .model-name { font-weight: bold; color: var(--primary); display: block; margin-bottom: 10px; }
         button { background: var(--primary); color: white; border: none; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        button:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
         .feedback { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; font-weight: bold; }
         .feedback.correct { background: #d4edda; color: #155724; display: block; }
         .feedback.wrong { background: #f8d7da; color: #721c24; display: block; }
@@ -34,23 +35,49 @@
 
 <div class="container">
     <h1>Financial Models: Accessible Edition</h1>
-    <main>
-        <section class="scenario-card">
-            <p><strong>Scenario:</strong> <span id="current-scenario">Initializing Game...</span></p>
+    <main id="game-area">
+        <section class="scenario-card" aria-labelledby="scenario-label">
+            <h2 id="scenario-label" style="font-size: 1.1em; margin-bottom: 10px;">Goal: Identify the Model</h2>
+            <p><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
             
             <div class="custom-select-wrapper">
-                <div class="select-trigger" id="triggerText" role="combobox" aria-expanded="false" aria-haspopup="listbox" tabindex="0">
+                <div class="select-trigger" id="triggerText" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select mathematical model" tabindex="0">
                      -- Choose the Correct Model --
                 </div>
+                
                 <div class="custom-options" id="optionsContainer" role="listbox">
-                    <div class="custom-option" role="option" data-value="linear" aria-label="Linear Growth Formula"><span class="model-name">Linear Growth</span><math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi></math></div>
-                    <div class="custom-option" role="option" data-value="exponential" aria-label="Exponential Growth Formula"><span class="model-name">Exponential Growth</span><math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mi>r</mi></mrow></mfenced><mi>n</mi></msup></math></div>
-                    <div class="custom-option" role="option" data-value="logistic" aria-label="Logistic Growth Formula"><span class="model-name">Logistic Growth</span><math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi><mfenced><mrow><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac></mrow></mfenced><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub></math></div>
-                    <div class="custom-option" role="option" data-value="compound" aria-label="Compound Interest Formula"><span class="model-name">Compound Interest</span><math display="block"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup></math></div>
-                    <div class="custom-option" role="option" data-value="savings" aria-label="Savings Annuity Formula"><span class="model-name">Savings Annuity</span><math display="block"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><mfrac><mrow><mi>d</mi><mfenced><mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow></mfenced></mrow><mfenced><mfrac><mi>r</mi><mi>k</mi></mfrac></mfenced></mfrac></math></div>
-                    <div class="custom-option" role="option" data-value="payout" aria-label="Payout Annuity Formula"><span class="model-name">Payout/Loan Annuity</span><math display="block"><msub><mi>P</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mi>d</mi><mfenced><mrow><mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow></mfenced></mrow><mfenced><mfrac><mi>r</mi><mi>k</mi></mfrac></mfenced></mfrac></math></div>
+                    <div class="custom-option" role="option" data-value="linear" tabindex="0" aria-label="Linear Growth: P sub n equals P zero plus d times n">
+                        <span class="model-name">Linear Growth</span>
+                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi></math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="exponential" tabindex="0" aria-label="Exponential Growth: P sub n equals P zero times quantity one plus r, to the power of n">
+                        <span class="model-name">Exponential Growth</span>
+                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mi>r</mi></mrow></mfenced><mi>n</mi></msup></math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="logistic" tabindex="0" aria-label="Logistic Growth: P sub n equals P sub n minus one, plus r times quantity one minus P sub n minus one divided by K, times P sub n minus one">
+                        <span class="model-name">Logistic Growth</span>
+                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi><mfenced><mrow><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac></mrow></mfenced><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub></math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="compound" tabindex="0" aria-label="Compound Interest: A equals P times quantity one plus r over k, to the power of n times k">
+                        <span class="model-name">Compound Interest</span>
+                        <math display="block" aria-hidden="true"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup></math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="savings" tabindex="0" aria-label="Savings Annuity: P sub n equals d times the fraction of quantity one plus r over k to the power of n k, minus one, all over r divided by k">
+                        <span class="model-name">Savings Annuity</span>
+                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><mfrac><mrow><mi>d</mi><mfenced><mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow></mfenced></mrow><mfenced><mfrac><mi>r</mi><mi>k</mi></mfrac></mfenced></mfrac></math>
+                    </div>
+
+                    <div class="custom-option" role="option" data-value="payout" tabindex="0" aria-label="Payout Annuity: P zero equals d times the fraction of one minus quantity one plus r over k to the power of negative n k, all over r divided by k">
+                        <span class="model-name">Payout/Loan Annuity</span>
+                        <math display="block" aria-hidden="true"><msub><mi>P</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mi>d</mi><mfenced><mrow><mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow></mfenced></mrow><mfenced><mfrac><mi>r</mi><mi>k</mi></mfrac></mfenced></mfrac></math>
+                    </div>
                 </div>
             </div>
+
             <button type="button" id="checkButton">Check Answer</button>
             <div id="feedback" class="feedback" role="alert"></div>
         </section>
@@ -59,7 +86,6 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. DATA (All 16 slots)
     const allScenarios = [
         { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
         { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
@@ -67,19 +93,9 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
         { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
         { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" },
-        { text: "Scenario 7 Placeholder", answer: "linear" },
-        { text: "Scenario 8 Placeholder", answer: "exponential" },
-        { text: "Scenario 9 Placeholder", answer: "logistic" },
-        { text: "Scenario 10 Placeholder", answer: "compound" },
-        { text: "Scenario 11 Placeholder", answer: "savings" },
-        { text: "Scenario 12 Placeholder", answer: "payout" },
-        { text: "Scenario 13 Placeholder", answer: "linear" },
-        { text: "Scenario 14 Placeholder", answer: "exponential" },
-        { text: "Scenario 15 Placeholder", answer: "logistic" },
-        { text: "Scenario 16 Placeholder", answer: "compound" }
+        // Add more scenarios here
     ];
 
-    // 2. SHUFFLE IMMEDIATELY
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -88,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return array;
     }
 
-    const shuffledScenarios = shuffle([...allScenarios]);
+    const shuffled = shuffle([...allScenarios]);
     let currentIndex = 0;
     let selectedValue = "";
 
@@ -99,21 +115,30 @@ document.addEventListener("DOMContentLoaded", function() {
     const scenarioSpan = document.getElementById('current-scenario');
 
     function loadScenario() {
-        if (currentIndex >= shuffledScenarios.length) {
-            scenarioSpan.innerText = "Challenge Complete! All 16 identified correctly. Refresh to play again.";
+        if (currentIndex >= shuffled.length) {
+            scenarioSpan.innerText = "Review Complete! Refresh to play again.";
             trigger.parentElement.style.display = 'none';
             checkBtn.style.display = 'none';
             return;
         }
-        scenarioSpan.innerText = shuffledScenarios[currentIndex].text;
+        scenarioSpan.innerText = shuffled[currentIndex].text;
         trigger.innerText = "-- Choose the Correct Model --";
         selectedValue = "";
         feedbackDiv.style.display = 'none';
+        trigger.setAttribute('aria-expanded', 'false');
     }
 
     trigger.addEventListener('click', (e) => {
         e.stopPropagation();
-        optionsCont.classList.toggle('open');
+        const isOpen = optionsCont.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', isOpen);
+    });
+
+    trigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            trigger.click();
+        }
     });
 
     document.querySelectorAll('.custom-option').forEach(opt => {
@@ -121,23 +146,30 @@ document.addEventListener("DOMContentLoaded", function() {
             selectedValue = this.getAttribute('data-value');
             trigger.innerText = this.querySelector('.model-name').innerText;
             optionsCont.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+        });
+        opt.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
         });
     });
 
     checkBtn.addEventListener('click', function() {
         if (!selectedValue) return;
         feedbackDiv.style.display = 'block';
-        if (selectedValue === shuffledScenarios[currentIndex].answer) {
-            feedbackDiv.innerText = "✓ Correct!";
+        if (selectedValue === shuffled[currentIndex].answer) {
+            feedbackDiv.innerText = "Correct!";
             feedbackDiv.className = "feedback correct";
             setTimeout(() => { currentIndex++; loadScenario(); }, 1800);
         } else {
-            feedbackDiv.innerText = "✗ Try again!";
+            feedbackDiv.innerText = "Not quite. Try again!";
             feedbackDiv.className = "feedback wrong";
         }
     });
 
-    // START
     loadScenario();
 });
 </script>
