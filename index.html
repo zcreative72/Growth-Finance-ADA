@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessible Financial Models Challenge</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
         :root {
             --primary: #2d5a5a;
@@ -30,7 +33,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
 
         .scenario-card {
             background: #fff;
@@ -52,17 +55,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 15px;
+            padding: 15px;
             background: #fff;
             border: 2px solid #ccc;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: bold;
+            font-size: 1.1em;
         }
 
         .select-trigger:after {
             content: '▼';
-            font-size: 0.8em;
+            font-size: 0.7em;
             margin-left: 10px;
             color: var(--primary);
         }
@@ -78,7 +82,7 @@
             border-top: none;
             border-radius: 0 0 8px 8px;
             z-index: 100;
-            max-height: 450px;
+            max-height: 480px;
             overflow-y: auto;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
@@ -86,171 +90,43 @@
         .custom-options.open { display: block; }
 
         .custom-option {
-            padding: 15px;
+            padding: 20px 15px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             border-bottom: 1px solid #eee;
+            transition: background 0.2s;
         }
 
         .custom-option:hover { background: var(--secondary); }
 
         .custom-option .model-name {
             font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 8px;
+            font-size: 1.05em;
+            margin-bottom: 10px;
             color: var(--primary);
-        }
-
-        /* MathML Scaling */
-        .custom-option math {
-            font-size: 1.2em;
         }
 
         button {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 14px 28px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1em;
         }
 
         .feedback {
             margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 6px;
             display: none;
             font-weight: bold;
         }
 
         .feedback.correct { background: #d4edda; color: #155724; display: block; }
         .feedback.wrong { background: #f8d7da; color: #721c24; display: block; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Financial Models: Accessible Edition</h2>
-    
-    <div id="game-area">
-        <div class="scenario-card">
-            <p id="scenario-text"><strong>Scenario:</strong> <span id="current-scenario">Loading...</span></p>
-            
-            <div class="custom-select-wrapper" id="customSelect">
-                <div class="select-trigger" id="triggerText">-- Choose the Correct Model --</div>
-                <div class="custom-options" id="optionsContainer">
-                    
-                    <div class="custom-option" data-value="linear">
-                        <span class="model-name">Linear Growth</span>
-                        <math display="block">
-                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><mo>+</mo><mi>d</mi><mi>n</mi>
-                        </math>
-                    </div>
-
-                    <div class="custom-option" data-value="exponential">
-                        <span class="model-name">Exponential Growth</span>
-                        <math display="block">
-                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mn>0</mn></msub><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>)</mo></mrow><mi>n</mi></msup>
-                        </math>
-                    </div>
-
-                    <div class="custom-option" data-value="logistic">
-                        <span class="model-name">Logistic Growth</span>
-                        <math display="block">
-                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>r</mi><mfenced><mrow><mn>1</mn><mo>-</mo><mfrac><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub><mi>K</mi></mfrac></mrow></mfenced><msub><mi>P</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub>
-                        </math>
-                    </div>
-
-                    <div class="custom-option" data-value="compound">
-                        <span class="model-name">Compound Interest</span>
-                        <math display="block">
-                            <mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup>
-                        </math>
-                    </div>
-
-                    <div class="custom-option" data-value="savings">
-                        <span class="model-name">Savings Annuity</span>
-                        <math display="block">
-                            <mi>F</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mfenced open="[" close="]"><mfrac><mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac></mfenced>
-                        </math>
-                    </div>
-
-                    <div class="custom-option" data-value="payout">
-                        <span class="model-name">Payout/Loan Annuity</span>
-                        <math display="block">
-                            <mi>P</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi><mfenced open="[" close="]"><mfrac><mrow><mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup></mrow><mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow></mfrac></mfenced>
-                        </math>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="checkAnswer()">Check Answer</button>
-            <div id="feedback" class="feedback"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const scenarios = [
-        { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
-        { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
-        { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
-        { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" }
-    ];
-
-    let currentIndex = 0;
-    let selectedValue = "";
-
-    const wrapper = document.getElementById('customSelect');
-    const trigger = document.getElementById('triggerText');
-    const optionsCont = document.getElementById('optionsContainer');
-
-    trigger.addEventListener('click', () => optionsCont.classList.toggle('open'));
-
-    document.querySelectorAll('.custom-option').forEach(opt => {
-        opt.addEventListener('click', function() {
-            selectedValue = this.getAttribute('data-value');
-            trigger.innerHTML = this.querySelector('.model-name').innerText;
-            optionsCont.classList.remove('open');
-            document.getElementById('feedback').className = 'feedback';
-        });
-    });
-
-    window.addEventListener('click', (e) => {
-        if (!wrapper.contains(e.target)) optionsCont.classList.remove('open');
-    });
-
-    function loadScenario() {
-        document.getElementById('current-scenario').innerText = scenarios[currentIndex].text;
-        trigger.innerText = "-- Choose the Correct Model --";
-        selectedValue = "";
-        document.getElementById('feedback').className = 'feedback';
-    }
-
-    function checkAnswer() {
-        const feedback = document.getElementById('feedback');
-        if (!selectedValue) {
-            alert("Please select a model first!");
-            return;
-        }
-
-        if (selectedValue === scenarios[currentIndex].answer) {
-            feedback.innerText = "✓ Correct!";
-            feedback.className = "feedback correct";
-            setTimeout(() => {
-                currentIndex = (currentIndex + 1) % scenarios.length;
-                loadScenario();
-            }, 2000);
-        } else {
-            feedback.innerText = "✗ Not quite. Try again!";
-            feedback.className = "feedback wrong";
-        }
-    }
-
-    loadScenario();
-</script>
-
-</body>
-</html>
+        
+        /* Ensure MathML looks consistent
