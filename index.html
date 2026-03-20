@@ -108,6 +108,11 @@
             color: var(--primary);
         }
 
+        .button-container {
+            margin-top: 20px;
+            padding-top: 10px;
+        }
+
         button {
             background-color: var(--primary);
             color: white;
@@ -116,22 +121,27 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1em;
-            margin-top: 10px;
+            font-size: 1.1em;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #1e3d3d;
         }
 
         .feedback {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 6px;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
             display: none;
             font-weight: bold;
+            font-size: 1.1em;
         }
 
         .feedback.correct { background: #d4edda; color: #155724; display: block; }
         .feedback.wrong { background: #f8d7da; color: #721c24; display: block; }
         
-        math { font-size: 1.25em; }
+        math { font-size: 1.3em; }
     </style>
 </head>
 <body>
@@ -167,4 +177,107 @@
                     </div>
 
                     <div class="custom-option" data-value="compound">
-                        <span class="model
+                        <span class="model-name">Compound Interest</span>
+                        <math display="block"><mi>A</mi><mo>=</mo><mi>P</mi><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup></math>
+                    </div>
+
+                    <div class="custom-option" data-value="savings">
+                        <span class="model-name">Savings Annuity</span>
+                        <math display="block">
+                            <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo>
+                            <mfrac>
+                                <mrow> <mi>d</mi> <mfenced><mrow> <msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn> </mrow></mfenced> </mrow>
+                                <mrow> <mfenced><mrow><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced> </mrow>
+                            </mfrac>
+                        </math>
+                    </div>
+
+                    <div class="custom-option" data-value="payout">
+                        <span class="model-name">Payout/Loan Annuity</span>
+                        <math display="block">
+                            <msub><mi>P</mi><mn>0</mn></msub><mo>=</mo>
+                            <mfrac>
+                                <mrow> <mi>d</mi> <mfenced><mrow> <mn>1</mn><mo>-</mo><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mo>-</mo><mi>n</mi><mi>k</mi></mrow></msup> </mrow></mfenced> </mrow>
+                                <mrow> <mfenced><mrow><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced> </mrow>
+                            </mfrac>
+                        </math>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="button" onclick="checkAnswer()">Check Answer</button>
+            </div>
+            
+            <div id="feedback" class="feedback"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scenarios = [
+        { text: "A rental car company charges $45 plus 25 cents per each mile driven.", answer: "linear" },
+        { text: "A population of fish in a pond is growing by 12% a year, but the pond can only support 1000 fish.", answer: "logistic" },
+        { text: "Monthly deposits of $200 into an account earning 5% interest for 20 years.", answer: "savings" },
+        { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
+        { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
+        { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" }
+    ];
+
+    let currentIndex = 0;
+    let selectedValue = "";
+
+    const trigger = document.getElementById('triggerText');
+    const optionsCont = document.getElementById('optionsContainer');
+
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        optionsCont.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.custom-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            selectedValue = this.getAttribute('data-value');
+            trigger.innerText = this.querySelector('.model-name').innerText;
+            optionsCont.classList.remove('open');
+            document.getElementById('feedback').style.display = 'none';
+        });
+    });
+
+    window.addEventListener('click', function() {
+        optionsCont.classList.remove('open');
+    });
+
+    function loadScenario() {
+        document.getElementById('current-scenario').innerText = scenarios[currentIndex].text;
+        trigger.innerText = "-- Choose the Correct Model --";
+        selectedValue = "";
+        document.getElementById('feedback').style.display = 'none';
+    }
+
+    function checkAnswer() {
+        const fb = document.getElementById('feedback');
+        if (!selectedValue) {
+            alert("Please select a model first!");
+            return;
+        }
+
+        fb.style.display = 'block';
+        if (selectedValue === scenarios[currentIndex].answer) {
+            fb.innerText = "✓ Correct! Moving to next scenario...";
+            fb.className = "feedback correct";
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % scenarios.length;
+                loadScenario();
+            }, 2500);
+        } else {
+            fb.innerText = "✗ Not quite. Look closely at the growth rate or time period.";
+            fb.className = "feedback wrong";
+        }
+    }
+
+    loadScenario();
+</script>
+
+</body>
+</html>
