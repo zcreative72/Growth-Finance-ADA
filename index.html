@@ -179,17 +179,30 @@
                     </div>
 
                     <div class="custom-option" data-value="savings">
-                        <span class="model-name">Savings Annuity</span>
-                        <math display="block">
-                            <mi>F</mi><mi>V</mi><mo>=</mo><mi>P</mi><mi>M</mi><mi>T</mi>
-                            <mfenced><mrow>
-                                <mfrac>
-                                    <mrow><msup><mfenced><mrow><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><mi>k</mi></mfrac></mrow></mfenced><mrow><mi>n</mi><mi>k</mi></mrow></msup><mo>-</mo><mn>1</mn></mrow>
-                                    <mrow><mi>r</mi><mo>/</mo><mi>k</mi></mrow>
-                                </mfrac>
-                            </mrow></mfenced>
-                        </math>
-                    </div>
+    <span class="model-name">Savings Annuity</span>
+    <math display="block">
+        <msub><mi>P</mi><mi>n</mi></msub><mo>=</mo><mi>d</mi>
+        <mfenced><mrow>
+            <mfrac>
+                <mrow>
+                    <msup>
+                        <mfenced><mrow>
+                            <mn>1</mn><mo>+</mo>
+                            <mfrac><mi>r</mi><mi>k</mi></mfrac>
+                        </mrow></mfenced>
+                        <mrow><mi>n</mi><mi>k</mi></mrow>
+                    </msup>
+                    <mo>-</mo><mn>1</mn>
+                </mrow>
+                <mrow>
+                    <mfenced><mrow>
+                        <mfrac><mi>r</mi><mi>k</mi></mfrac>
+                    </mrow></mfenced>
+                </mrow>
+            </mfrac>
+        </mrow></mfenced>
+    </math>
+</div>
 
                     <div class="custom-option" data-value="payout">
                         <span class="model-name">Payout/Loan Annuity</span>
