@@ -94,7 +94,16 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "Suppose you have $7400 deposited at 2.85% compounded quarterly.", answer: "compound" },
         { text: "Withdrawing $1000 monthly from a retirement account for 25 years.", answer: "payout" },
         { text: "Inflation decreases the value of money by 4% each year.", answer: "exponential" },
-        // ... fill in the rest of your 16 scenarios here
+        { text: "A population starts at 500 and increases by 40 people every month.", answer: "linear" },
+        { text: "A bacteria culture doubles in size every 3 hours.", answer: "exponential" },
+        { text: "An investment of $5000 earns 6% interest compounded monthly.", answer: "compound" },
+        { text: "You want to withdraw $500 per month for 10 years from an account earning 4%.", answer: "payout" },
+        { text: "Saving $150 each month for a down payment in 5 years at 3% interest.", answer: "savings" },
+        { text: "A forest can only support 5000 deer; the population grows based on current size and available space.", answer: "logistic" },
+        { text: "A gym membership costs $30 per month plus a $5 fee for every group class attended.", answer: "linear" },
+        { text: "The value of a rare coin increases by 8% every year.", answer: "exponential" },
+        { text: "A city's growth is limited by its geographical boundaries and resources.", answer: "logistic" },
+        { text: "Putting $10,000 into a high-yield savings account at 4.5% interest for 3 years.", answer: "compound" }
     ];
 
     // 2. SHUFFLE
@@ -118,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function loadScenario() {
         if (currentIndex >= shuffled.length) {
-            scenarioSpan.innerText = "Challenge Complete! Refresh to play again.";
+            scenarioSpan.innerText = "Review Complete! Refresh to restart.";
             trigger.parentElement.style.display = 'none';
             checkBtn.style.display = 'none';
             return;
@@ -163,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!selectedValue) return;
         feedbackDiv.style.display = 'block';
         if (selectedValue === shuffled[currentIndex].answer) {
-            feedbackDiv.innerText = "✓ Correct!";
+            feedbackDiv.innerText = "✓ Correct! Loading next...";
             feedbackDiv.className = "feedback correct";
             setTimeout(() => { currentIndex++; loadScenario(); }, 1800);
         } else {
